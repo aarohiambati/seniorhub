@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>{{ school.name }}: university deadlines</h1><a class="btn" href="{% url 'deadline_new' %}">+ Add deadline</a></div>
+<p class="muted">Dates you add here are shown to your school's students only, labelled "added by your school", and count toward their reminders. Official dates are on the <a href="{% url 'universities' %}">Universities</a> page; check them before adding.</p>
+<input class="search" type="search" placeholder="Search by university or title…" data-filter="#school-dls li">
+<section class="card" id="school-dls"><ul class="list">
+{% for d in deadlines %}<li><div><strong>{{ d.title }}</strong><small>{{ d.university|default:"All students" }} · {{ d.get_kind_display }}{% if d.added_by %} · by {{ d.added_by.username }}{% endif %}</small></div>
+  <div class="row"><span class="pill">{{ d.due|date:"M j, Y" }}</span><a class="btn small" href="{% url 'deadline_edit' d.pk %}">Edit</a>
+  <form method="post" action="{% url 'deadline_delete' d.pk %}" onsubmit="return confirm('Delete this deadline?')">{% csrf_token %}<button class="btn small danger">✕</button></form></div></li>
+{% empty %}<li class="muted">No school deadlines yet.</li>{% endfor %}</ul></section>
+{% endblock %}

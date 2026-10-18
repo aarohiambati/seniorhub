@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Application checklist</h1>
+<div class="bar"><span style="width:{{ percent }}%"></span></div>
+<p>{{ done }} of {{ total }} complete{% if percent == 100 %} 🎉 You can sit back and wait for decisions.{% endif %}</p>
+<input class="search" type="search" placeholder="Search your checklist…" data-filter="#checklist li" data-group="#checklist section.card">
+<div id="checklist">
+{% for label, items, custom in groups %}
+{% if not custom or items %}<section class="card"><h2>{{ label }}{% if custom %} <small class="muted">(my list)</small>{% endif %}</h2>
+<ul class="list">{% for i in items %}
+  <li class="{% if i.done %}done{% endif %}"><div><strong>{{ i.title }}</strong>{% if i.help_text %}<small>{{ i.help_text }}</small>{% endif %}{% if i.due %}<small>Due {{ i.due|date:"M j, Y" }}</small>{% endif %}</div>
+  <div class="row"><form method="post" action="{% url 'checklist_toggle' i.pk %}">{% csrf_token %}<button class="btn small">{% if i.done %}Undo{% else %}Done{% endif %}</button></form>
+  {% if not i.template %}<form method="post" action="{% url 'checklist_delete' i.pk %}">{% csrf_token %}<button class="btn small danger">✕</button></form>{% endif %}</div></li>
+{% empty %}<li class="muted">Nothing here.</li>{% endfor %}</ul></section>{% endif %}
+{% endfor %}
+</div>
+<section class="card narrow"><h2>Make your own checklist</h2><p class="muted">Use the same name to add to an existing list, or a new name to start another one.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn">Add</button></form></section>
+{% endblock %}

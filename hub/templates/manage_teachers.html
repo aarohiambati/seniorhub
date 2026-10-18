@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Teachers at {{ school.name }}</h1>
+<p class="muted">Approved teachers can edit your school's master calendar. Only approve people you know work at your school.</p>
+<input class="search" type="search" placeholder="Search teachers…" data-filter="#teachers li">
+<section class="card" id="teachers"><ul class="list">
+{% for t in teachers %}<li><div><strong>{{ t.user.username }}</strong><small>{{ t.user.email|default:"no email" }} · {% if t.teacher_approved %}approved{% else %}<span class="warn">waiting for approval</span>{% endif %}</small></div>
+  <form method="post" action="{% if t.teacher_approved %}{% url 'teacher_revoke' t.pk %}{% else %}{% url 'teacher_approve' t.pk %}{% endif %}">{% csrf_token %}
+  <button class="btn small {% if t.teacher_approved %}danger{% endif %}">{% if t.teacher_approved %}Revoke{% else %}Approve{% endif %}</button></form></li>
+{% empty %}<li class="muted">No teachers have signed up for your school yet. Teachers choose your school when they create an account.</li>{% endfor %}
+</ul></section>
+{% endblock %}

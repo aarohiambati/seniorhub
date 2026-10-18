@@ -1,0 +1,32 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.dashboard, name="dashboard"),
+    path("calendar/", views.calendar_view, name="calendar"),
+    path("calendar/personal/add/", views.personal_add, name="personal_add"),
+    path("calendar/personal/<int:pk>/delete/", views.personal_delete, name="personal_delete"),
+    path("deadlines/", views.deadlines, name="deadlines"),
+    path("universities/", views.universities, name="universities"),
+    path("applications/", views.applications, name="applications"),
+    path("applications/new/", views.application_edit, name="application_new"),
+    path("applications/<int:pk>/edit/", views.application_edit, name="application_edit"),
+    path("applications/<int:pk>/delete/", views.application_delete, name="application_delete"),
+    path("checklist/", views.checklist, name="checklist"),
+    path("checklist/<int:pk>/toggle/", views.checklist_toggle, name="checklist_toggle"),
+    path("checklist/<int:pk>/delete/", views.checklist_delete, name="checklist_delete"),
+    path("settings/", views.settings_page, name="settings"),
+    path("school-calendar/", views.manage_events, name="manage_events"),
+    path("school-calendar/new/", views.event_edit, name="event_new"),
+    path("school-calendar/<int:pk>/edit/", views.event_edit, name="event_edit"),
+    path("school-calendar/<int:pk>/delete/", views.event_delete, name="event_delete"),
+    path("school-deadlines/", views.manage_deadlines, name="manage_deadlines"),
+    path("school-deadlines/new/", views.deadline_edit, name="deadline_new"),
+    path("school-deadlines/<int:pk>/edit/", views.deadline_edit, name="deadline_edit"),
+    path("school-deadlines/<int:pk>/delete/", views.deadline_delete, name="deadline_delete"),
+    path("school-teachers/", views.manage_teachers, name="manage_teachers"),
+    path("school-teachers/<int:pk>/approve/", views.teacher_decide, {"approve": True}, name="teacher_approve"),
+    path("school-teachers/<int:pk>/revoke/", views.teacher_decide, {"approve": False}, name="teacher_revoke"),
+    path("schools/search/", views.school_search, name="school_search"),
+    path("signup/", views.signup, name="signup"),
+]

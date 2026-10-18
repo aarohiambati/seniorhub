@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>{{ school.name }} calendar</h1><a class="btn" href="{% url 'event_new' %}">+ Add event</a></div>
+<p class="muted">Everything here is visible to students at your school. Use "School deadline" for things like transcript request dates, and students will get reminders.</p>
+<input class="search" type="search" placeholder="Search events…" data-filter="#events li">
+<section class="card" id="events"><ul class="list">
+{% for e in events %}<li><div><strong>{{ e.title }}</strong><small>{{ e.get_category_display }}{% if e.description %} · {{ e.description|truncatechars:80 }}{% endif %}</small></div>
+  <div class="row"><span class="pill">{{ e.start|date:"M j, Y" }}{% if e.end %} – {{ e.end|date:"M j" }}{% endif %}</span>
+  <a class="btn small" href="{% url 'event_edit' e.pk %}">Edit</a>
+  <form method="post" action="{% url 'event_delete' e.pk %}" onsubmit="return confirm('Delete this event?')">{% csrf_token %}<button class="btn small danger">✕</button></form></div></li>
+{% empty %}<li class="muted">No events yet.</li>{% endfor %}</ul></section>
+{% endblock %}

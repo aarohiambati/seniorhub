@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Hi {{ user.username }}</h1>
+<div class="grid">
+  <section class="card"><h2>Checklist progress</h2>
+    <div class="bar"><span style="width:{{ percent }}%"></span></div>
+    <p>{{ done }} of {{ total }} done ({{ percent }}%)</p>
+    <ul class="list">{% for i in todo %}<li>{{ i.title }}
+      <form method="post" action="{% url 'checklist_toggle' i.pk %}">{% csrf_token %}<input type="hidden" name="next" value="/"><button class="btn small">Done</button></form></li>{% endfor %}</ul>
+    <a href="{% url 'checklist' %}">Full checklist →</a></section>
+  <section class="card"><h2>Next deadlines</h2>{% include "_deadline_list.html" %}</section>
+  <section class="card"><h2>Needs attention</h2>
+    <ul class="list">{% for a in attention %}<li><div><strong>{{ a.university }}</strong> <small>{{ a.program }}</small></div>
+      <span class="pill hot">{% if a.supp_required and not a.supp_submitted %}Supplementary{% else %}Fee unpaid{% endif %}</span></li>
+    {% empty %}<li class="muted">Nothing outstanding.</li>{% endfor %}</ul>
+    <a href="{% url 'applications' %}">Manage applications →</a></section>
+  <section class="card"><h2>School calendar</h2>
+    <ul class="list">{% for e in events %}<li><div><strong>{{ e.title }}</strong><small>{{ e.get_category_display }}</small></div><span class="pill">{{ e.start|date:"M j" }}</span></li>
+    {% empty %}<li class="muted">No upcoming events (or no school selected).</li>{% endfor %}</ul>
+    <a href="{% url 'calendar' %}">Open calendar →</a></section>
+</div>
+{% endblock %}

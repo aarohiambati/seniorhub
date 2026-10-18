@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card narrow"><h1>Create your account</h1>
+<form method="post" id="signup">{% csrf_token %}
+  {{ form.non_field_errors }}
+  <p><label>I am a…</label>{{ form.role }}</p>
+  <fieldset class="school-pick"><legend>Your school</legend>
+    <select id="prov"><option value="">All provinces</option>{% for code, name in provinces %}<option value="{{ code }}">{{ name }}</option>{% endfor %}</select>
+    <input id="school-q" type="search" placeholder="Type your school or city…" autocomplete="off">
+    <ul id="school-results" class="list"></ul>
+    {{ form.school }}
+    <p id="school-chosen" class="muted">No school selected</p>
+    {{ form.school.errors }}
+  </fieldset>
+  <p>{{ form.username.label_tag }}{{ form.username }}{{ form.username.errors }}</p>
+  <p>{{ form.email.label_tag }}{{ form.email }}</p>
+  <p>{{ form.password1.label_tag }}{{ form.password1 }}{{ form.password1.errors }}</p>
+  <p>{{ form.password2.label_tag }}{{ form.password2 }}{{ form.password2.errors }}</p>
+  <p id="grad">{{ form.grad_year.label_tag }}{{ form.grad_year }}</p>
+  <p class="muted" id="teacher-note" hidden>Teachers are approved by their school's administrator, and administrators are approved by the site owner, before they can edit the school calendar. Use your school email. Students get in right away.</p>
+  <button class="btn">Sign up</button>
+</form>
+<p><a href="{% url 'login' %}">Already have an account?</a></p></section>
+<script>
+const q=document.getElementById('school-q'),prov=document.getElementById('prov'),res=document.getElementById('school-results'),
+      hid=document.getElementById('{{ form.school.id_for_label }}'),chosen=document.getElementById('school-chosen');
+let t;
+function search(){clearTimeout(t);t=setTimeout(async()=>{
+  if(q.value.trim().length<2){res.innerHTML='';return;}
+  const r=await fetch(`{% url 'school_search' %}?q=${encodeURIComponent(q.value)}&province=${prov.value}`);
+  const d=await r.json();res.innerHTML='';
+  d.results.forEach(s=>{const li=document.createElement('li'),b=document.createElement('button');
+    b.type='button';b.className='btn small';b.textContent=s.label;
+    b.onclick=()=>{hid.value=s.id;chosen.textContent='Selected: '+s.label;res.innerHTML='';};
+    li.appendChild(b);res.appendChild(li);});
+  if(!d.results.length){res.innerHTML='<li class="muted">No match. Ask your administrator to add your school.</li>';}
+},250);}
+q.addEventListener('input',search);prov.addEventListener('change',search);
+document.querySelectorAll('input[name=role]').forEach(r=>r.addEventListener('change',()=>{
+  const staff=document.querySelector('input[name=role]:checked').value!=='student';
+  document.getElementById('grad').hidden=staff;document.getElementById('teacher-note').hidden=!staff;}));
+</script>
+{% endblock %}

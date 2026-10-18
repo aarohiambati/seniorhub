@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>My applications</h1><a class="btn" href="{% url 'application_new' %}">+ Add</a></div>
+{% if apps|length > 3 %}<input class="search" type="search" placeholder="Search my applications…" data-filter=".app-card">{% endif %}
+<div class="grid">
+{% for a in apps %}
+  <section class="card app-card"><h2>{{ a.university }}</h2><p>{{ a.program }}</p>
+    <p><span class="pill">{{ a.get_round_display }}</span> <span class="pill">{{ a.get_status_display }}</span></p>
+    <ul class="checks"><li>{% if a.fee_paid %}✅{% else %}⬜{% endif %} Fee paid</li>
+    {% if a.supp_required %}<li>{% if a.supp_submitted %}✅{% else %}⬜{% endif %} Supplementary</li>{% endif %}</ul>
+    <div class="row"><a class="btn small" href="{% url 'application_edit' a.pk %}">Edit</a>
+    <form method="post" action="{% url 'application_delete' a.pk %}" onsubmit="return confirm('Delete this application?')">{% csrf_token %}<button class="btn small danger">Delete</button></form></div></section>
+{% empty %}<p class="muted">No applications yet. Add one to see its deadlines.</p>{% endfor %}
+</div>
+{% endblock %}

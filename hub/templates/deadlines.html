@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}<div class="row"><h1>{% if scope == "all" %}Master deadline list{% else %}My deadlines{% endif %}</h1>
+<a class="btn small" href="?scope={% if scope == "all" %}mine{% else %}all{% endif %}">Show {% if scope == "all" %}only my universities{% else %}all universities{% endif %}</a></div>
+<input class="search" type="search" placeholder="Search by university, program or type (e.g. Waterloo, supplementary)…" data-filter="#dl-card li">
+<section class="card" id="dl-card">{% include "_deadline_list.html" %}</section>
+<p class="muted">Deadlines marked unverified were entered as a starting point. Always confirm on the university's official site.</p>
+{% endblock %}

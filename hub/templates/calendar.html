@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><a class="btn small" href="{{ prev }}">←</a><h1>{{ title }}</h1><a class="btn small" href="{{ next }}">→</a></div>
+<p><a href="?y={{ y }}&m={{ m }}&scope={% if scope == 'all' %}mine{% else %}all{% endif %}">Showing {% if scope == 'all' %}all university deadlines · switch to mine only{% else %}my deadlines only · switch to all universities{% endif %}</a></p>
+{% if not school %}<p class="warn">No school set on your account, so school events are hidden.</p>{% endif %}
+<p class="muted">Tap any date to see what's on it or add your own note.</p>
+<div class="cal">
+  {% for w in weekdays %}<div class="dow">{{ w }}</div>{% endfor %}
+  {% for week in grid %}{% for day in week %}
+  <div class="day {% if day.other %}other{% endif %} {% if day.today %}today{% endif %}" data-date="{{ day.date|date:'Y-m-d' }}" tabindex="0" role="button">
+    <b>{{ day.date.day }}</b>
+    {% for e in day.entries %}<span class="tag {{ e.cls }}" {% if e.pid %}data-pid="{{ e.pid }}"{% endif %}>{{ e.label }}</span>{% endfor %}
+  </div>{% endfor %}{% endfor %}
+</div>
+<p class="legend"><span class="tag personal">My note</span><span class="tag deadline">University deadline</span><span class="tag academic">Academic</span><span class="tag exam">Exam</span><span class="tag holiday">No school</span><span class="tag event">Event</span><span class="tag guidance">Guidance</span><span class="tag school_deadline">School deadline</span></p>
+
+<dialog id="day-dlg" data-del="{% url 'personal_delete' 0 %}">
+  <div class="row"><h2 id="dlg-title"></h2><button type="button" class="btn small danger" id="dlg-close">✕</button></div>
+  <ul id="dlg-list" class="list"></ul>
+  <form method="post" action="{% url 'personal_add' %}" id="dlg-add">{% csrf_token %}
+    <input type="hidden" name="date"><input type="hidden" name="next">
+    <input name="title" maxlength="140" placeholder="Add a note or reminder…" required autocomplete="off">
+    <button class="btn">Add to my calendar</button>
+  </form>
+</dialog>
+<script>
+const dlg=document.getElementById('day-dlg'),list=document.getElementById('dlg-list'),add=document.getElementById('dlg-add'),
+      token=add.querySelector('[name=csrfmiddlewaretoken]').value;
+function openDay(cell){
+  const iso=cell.dataset.date;
+  document.getElementById('dlg-title').textContent=new Date(iso+'T00:00').toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  list.innerHTML='';
+  cell.querySelectorAll('.tag').forEach(t=>{
+    const li=document.createElement('li'),tag=document.createElement('span');
+    tag.className=t.className;tag.textContent=t.textContent;tag.style.whiteSpace='normal';li.appendChild(tag);
+    if(t.dataset.pid){
+      const f=document.createElement('form');f.method='post';f.action=dlg.dataset.del.replace('/0/','/'+t.dataset.pid+'/');
+      f.innerHTML='<input type="hidden" name="csrfmiddlewaretoken"><input type="hidden" name="next"><button class="btn small danger">Delete</button>';
+      f.elements.csrfmiddlewaretoken.value=token;f.elements.next.value=location.search;li.appendChild(f);
+    }
+    list.appendChild(li);
+  });
+  if(!list.children.length){list.innerHTML='<li class="muted">Nothing on this day yet.</li>';}
+  add.elements.date.value=iso;add.elements.next.value=location.search;add.elements.title.value='';
+  dlg.showModal();add.elements.title.focus();
+}
+document.querySelectorAll('.day').forEach(c=>{
+  c.addEventListener('click',()=>openDay(c));
+  c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDay(c);}});
+});
+document.getElementById('dlg-close').onclick=()=>dlg.close();
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
+</script>
+{% endblock %}

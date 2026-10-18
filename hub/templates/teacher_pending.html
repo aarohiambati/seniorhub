@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}<section class="card narrow"><h1>Approval needed</h1>
+{% if profile.role == "student" %}<p>Only approved teachers and school administrators can do this. Students can view the school calendar and manage their own notes and checklists.</p>
+{% elif not profile.school %}<p>Your account has no school set. Ask the site owner to assign one.</p>
+{% elif need_admin and profile.role == "teacher" %}<p>Only a school administrator can manage teachers.</p>
+{% elif not profile.teacher_approved %}<p>Your account is waiting for approval.
+{% if profile.role == "teacher" %}Your school administrator can approve you.{% else %}The site owner will verify and approve school administrators.{% endif %}</p>
+{% else %}<p>You don't have access to this page.</p>{% endif %}
+<a href="{% url 'dashboard' %}">Back home</a></section>{% endblock %}

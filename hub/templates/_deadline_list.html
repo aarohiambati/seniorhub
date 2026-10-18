@@ -1,0 +1,7 @@
+<ul class="list">
+{% for d in deadlines %}
+  <li><div><strong>{{ d.title }}</strong>
+    <small>{{ d.university|default:"Everyone" }} · {{ d.get_kind_display }}{% if d.school_id %} · <span class="ok">added by your school</span>{% elif not d.verified %} · <span class="warn">unverified, check official site</span>{% endif %}</small></div>
+    <span class="pill {% if d.days_left <= 7 %}hot{% endif %}">{{ d.due|date:"M j, Y" }} · {{ d.days_left }}d</span></li>
+{% empty %}<li class="muted">No upcoming deadlines yet. Add applications to see theirs.</li>{% endfor %}
+</ul>

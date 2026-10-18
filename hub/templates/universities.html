@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row"><h1>Universities</h1>
+<form method="get"><select name="province" onchange="this.form.submit()"><option value="">All provinces</option>
+{% for code, name in provinces %}<option value="{{ code }}" {% if code == prov %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></form></div>
+<input class="search" type="search" placeholder="Search universities, cities or programs…" data-filter=".uni-card" data-empty="#no-uni" autofocus>
+<p class="muted">Dates appear once confirmed. Where none are listed, open the official page to check the Fall 2027 deadline.</p>
+<p id="no-uni" class="muted" hidden>No universities match your search.</p>
+<div class="grid">
+{% for u, dls in rows %}
+  <section class="card uni-card"><h2>{{ u.name }}</h2><small class="muted">{{ u.city }}{% if u.city %} · {% endif %}{{ u.get_province_display }}</small>
+  {% if dls %}<ul class="list">{% for d in dls %}<li><div><strong>{{ d.title }}</strong>{% if d.school_id %}<small class="ok">added by your school</small>{% elif not d.verified %}<small class="warn">unverified</small>{% endif %}</div><span class="pill">{{ d.due|date:"M j, Y" }}</span></li>{% endfor %}</ul>
+  {% else %}<p class="warn">{{ u.deadline_status|default:"No dates entered yet" }}</p>{% endif %}
+  {% if u.website %}<a href="{{ u.website }}" target="_blank" rel="noopener">Official admissions page ↗</a>{% endif %}</section>
+{% empty %}<p class="muted">No universities loaded yet.</p>{% endfor %}
+</div>{% endblock %}

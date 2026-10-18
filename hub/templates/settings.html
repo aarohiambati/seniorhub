@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}<section class="card narrow"><h1>Settings</h1>
+<form method="post">{% csrf_token %}
+  <h2>Colour scheme</h2>
+  <div class="themes">{% for radio in form.theme %}<label class="swatch" data-t="{{ radio.data.value }}">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>{% endfor %}</div>
+  <p>{{ form.remind_days.label_tag }}{{ form.remind_days }}{{ form.remind_days.errors }}</p>
+  <button class="btn">Save</button>
+</form></section>{% endblock %}

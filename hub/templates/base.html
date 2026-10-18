@@ -1,0 +1,54 @@
+{% load static %}<!doctype html>
+<html lang="en" data-theme="{{ theme|default:'crimson' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}SeniorHub{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'hub/style.css' %}">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{% url 'dashboard' %}">SeniorHub</a>
+  {% if user.is_authenticated %}
+  <nav>
+    <a href="{% url 'dashboard' %}">Home</a>
+    <a href="{% url 'calendar' %}">Calendar</a>
+    <a href="{% url 'deadlines' %}">Deadlines</a>
+    <a href="{% url 'universities' %}">Universities</a>
+    <a href="{% url 'applications' %}">Applications</a>
+    <a href="{% url 'checklist' %}">Checklist</a>
+    {% if my_profile.role == "teacher" or my_profile.role == "admin" %}<a href="{% url 'manage_events' %}">School calendar</a>
+    <a href="{% url 'manage_deadlines' %}">School deadlines</a>{% endif %}
+    {% if my_profile.role == "admin" %}<a href="{% url 'manage_teachers' %}">Teachers{% if pending_teachers %} ({{ pending_teachers }} new){% endif %}</a>{% endif %}
+    <a href="{% url 'settings' %}">Settings</a>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link">Log out</button></form>
+  </nav>
+  {% endif %}
+</header>
+<main>
+{% for a in alerts %}<div class="alert {% if a.days <= 3 %}urgent{% endif %}">⏰ <strong>{{ a.title }}</strong> is due {{ a.due|date:"F j, Y" }}
+  ({% if a.days == 0 %}today{% elif a.days == 1 %}tomorrow{% else %}in {{ a.days }} days{% endif %})</div>{% endfor %}
+{% block content %}{% endblock %}</main>
+<script>
+/* Live search: <input data-filter="CSS selector of items" [data-group="selector of containers"] [data-empty="#msg"]> */
+document.querySelectorAll('input[data-filter]').forEach(inp=>{
+  inp.addEventListener('input',()=>{
+    const q=inp.value.toLowerCase().trim(), items=[...document.querySelectorAll(inp.dataset.filter)];
+    items.forEach(el=>{el.hidden=!!q&&!el.textContent.toLowerCase().includes(q);});
+    if(inp.dataset.group)document.querySelectorAll(inp.dataset.group).forEach(g=>{
+      g.hidden=!!q&&![...g.querySelectorAll('li')].some(li=>!li.hidden);});
+    const msg=inp.dataset.empty&&document.querySelector(inp.dataset.empty);
+    if(msg)msg.hidden=!q||items.some(el=>!el.hidden);
+  });
+});
+/* Search box that narrows a <select>: <input data-select="#id_field"> */
+document.querySelectorAll('input[data-select]').forEach(inp=>{
+  const sel=document.querySelector(inp.dataset.select),all=[...sel.options].map(o=>({v:o.value,t:o.text}));
+  inp.addEventListener('input',()=>{
+    const q=inp.value.toLowerCase().trim(),cur=sel.value;sel.innerHTML='';
+    all.filter(o=>!o.v||o.t.toLowerCase().includes(q)).forEach(o=>sel.add(new Option(o.t,o.v,false,o.v===cur)));
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}<section class="card narrow"><h1>{% if deadline %}Edit{% else %}Add{% endif %} deadline</h1>
+<form method="post">{% csrf_token %}
+<p><label for="uni-find">Find a university</label><input id="uni-find" type="search" placeholder="Type to narrow the list…" data-select="#id_university"></p>
+{{ form.as_p }}<button class="btn">Save</button> <a href="{% url 'manage_deadlines' %}">Cancel</a></form></section>{% endblock %}
